@@ -34,4 +34,9 @@ Twitter and Square Chief Executive Officer Jack Dorsey
  Tuesday, a signal of the strong ties between the Silicon Valley giants.
 '''
 
-# write your code here
+url_dictionary = {'nytimes.com': nytimes_com, 'bloomberg.com': bloomberg_com}
+address = input()
+while address.lower() != 'exit':
+    if address in url_dictionary:
+        print(url_dictionary[address])
+    address = input()
