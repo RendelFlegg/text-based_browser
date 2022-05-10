@@ -1,3 +1,13 @@
+import argparse
+import os
+
+parser = argparse.ArgumentParser(description='Text browser')
+parser.add_argument('dir', nargs='?', type=str, default=False, help='Enter directory')
+args = parser.parse_args()
+directory = args.dir
+
+if not os.access(directory, os.F_OK):
+    os.mkdir(directory)
 
 nytimes_com = '''
 This New Liquid Is Magnetic, and Mesmerizing
@@ -37,6 +47,13 @@ Twitter and Square Chief Executive Officer Jack Dorsey
 url_dictionary = {'nytimes.com': nytimes_com, 'bloomberg.com': bloomberg_com}
 address = input()
 while address.lower() != 'exit':
-    if address in url_dictionary:
+    if '.' not in address and address in os.listdir(directory):
+        with open(f'{directory}/{address}', 'r') as f:
+            print(f.read())
+    elif address in url_dictionary:
         print(url_dictionary[address])
+        with open(f'{directory}/{address[:-4]}', 'w', encoding='utf-8') as f:
+            f.write(url_dictionary[address])
+    else:
+        print('Error: Incorrect URL')
     address = input()
