@@ -1,5 +1,17 @@
 import argparse
 import os
+from collections import deque
+
+
+def save_cash(page_address):
+    with open(f'{directory}/{page_address[:-4]}', 'w', encoding='utf-8') as f:
+        f.write(url_dictionary[page_address])
+
+
+def load_cash(page_address):
+    with open(f'{directory}/{page_address}', 'r') as f:
+        print(f.read())
+
 
 parser = argparse.ArgumentParser(description='Text browser')
 parser.add_argument('dir', nargs='?', type=str, default=False, help='Enter directory')
@@ -45,15 +57,22 @@ Twitter and Square Chief Executive Officer Jack Dorsey
 '''
 
 url_dictionary = {'nytimes.com': nytimes_com, 'bloomberg.com': bloomberg_com}
+history = deque()
+
 address = input()
+
 while address.lower() != 'exit':
-    if '.' not in address and address in os.listdir(directory):
-        with open(f'{directory}/{address}', 'r') as f:
-            print(f.read())
+    if '.' not in address and address in os.listdir(directory) and address.lower() != 'back':
+        load_cash(address)
+        history.append(address)
     elif address in url_dictionary:
         print(url_dictionary[address])
-        with open(f'{directory}/{address[:-4]}', 'w', encoding='utf-8') as f:
-            f.write(url_dictionary[address])
+        save_cash(address)
+        history.append(address[:-4])
+    elif address.lower() == 'back':
+        if history:
+            history.pop()
+            load_cash(history.pop())
     else:
         print('Error: Incorrect URL')
     address = input()
