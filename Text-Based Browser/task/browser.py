@@ -3,32 +3,30 @@ import os
 import requests
 from bs4 import BeautifulSoup
 from collections import deque
+from colorama import Fore, Style
 
 
-def save_cash(url, content):
-    url = url.strip('https://')[:url.rfind('.')]
-    with open(f'{directory}/{url}', 'w', encoding='utf-8') as f:
-        f.write(content)
-
-
-def save_cash_soup(url, content):
+def save_cache(url, content):
     url = url.strip('https://')[:url.rfind('.')]
     with open(f'{directory}/{url}', 'w', encoding='utf-8') as f:
         for line in content:
             if line.text == '':
                 continue
-            f.write(line.text + '\n')
+            if line.name == 'a':
+                f.write(Fore.BLUE + line.text + '\n')
+            else:
+                f.write(Style.RESET_ALL + line.text + '\n')
 
 
-def load_cash(page_address):
-    with open(f'{directory}/{page_address}', 'r', encoding='utf-8') as f:
+def load_cache(url):
+    with open(f'{directory}/{url}', 'r', encoding='utf-8') as f:
         print(f.read())
 
 
-def url_check(page_address):
-    if not page_address.startswith('https://'):
-        page_address = 'https://' + page_address
-    return page_address
+def url_check(url):
+    if not url.startswith('https://'):
+        url = 'https://' + url
+    return url
 
 
 parser = argparse.ArgumentParser(description='Text browser')
@@ -46,7 +44,7 @@ while address.lower() != 'exit':
     if address.lower() == 'back':
         if history:
             history.pop()
-            load_cash(history.pop())
+            load_cache(history.pop())
     else:
         try:
             r = requests.get(url_check(address))
@@ -55,8 +53,11 @@ while address.lower() != 'exit':
             for tag in tags:
                 if tag.text == '':
                     continue
-                print(tag.text)
-            save_cash_soup(address, tags)
+                if tag.name == 'a':
+                    print(Fore.BLUE + tag.text)
+                else:
+                    print(Style.RESET_ALL + tag.text)
+            save_cache(address, tags)
             history.append(address[:address.rfind('.')])
         except requests.exceptions.ConnectionError:
             print('Incorrect URL')
